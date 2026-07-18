@@ -76,38 +76,6 @@ const processSteps = [
   },
 ];
 
-  const eligibilityInfo = [
-    {
-      icon: CheckCircle,
-      title: "Who Can Donate",
-      items: [
-        "Age 17-75 (16 with parental consent)",
-        "Weight at least 110 lbs (50 kg)",
-        "Good general health",
-        "No flu or cold symptoms",
-      ],
-    },
-    {
-      icon: Stethoscope,
-      title: "Health Benefits",
-      items: [
-        "Free health screening",
-        "Burns 650 calories per donation",
-        "Reduces risk of heart disease",
-        "Stimulates blood cell production",
-      ],
-    },
-    {
-      icon: Shield,
-      title: "Safety First",
-      items: [
-        "Sterile, disposable equipment",
-        "Trained medical staff",
-        "Comfortable environment",
-        "Post-donation care",
-      ],
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-red-50 mt-10">
