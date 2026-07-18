@@ -60,7 +60,7 @@ export default function Header({ currentUser }) {
             to="/" 
             className="flex items-center gap-3 group"
           >
-            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+            <div className="w-11 h-11 flex items-center justify-center rounded-xl bg-red-600 shadow-md transition-all duration-300 group-hover:bg-red-700 group-hover:scale-105">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -71,11 +71,13 @@ export default function Header({ currentUser }) {
               </svg>
             </div>
             <div className="flex flex-col">
-              <h1 className="text-lg font-bold text-gray-900 group-hover:text-red-600 transition-colors duration-200">
-                {WEBSITE_NAME}
+              <h1 className="text-2xl font-bold tracking-tight">
+                <span className="text-gray-900">Vital</span>
+                <span className="text-red-600">Bridge</span>
               </h1>
-              <p className="text-xs text-gray-500 -mt-0.5 font-medium">
-                Blood Management System
+
+              <p className="text-xs text-gray-500 font-medium">
+                Connecting Donors. Saving Lives.
               </p>
             </div>
           </Link>

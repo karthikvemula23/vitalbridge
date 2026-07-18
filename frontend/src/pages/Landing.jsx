@@ -178,15 +178,15 @@ const LandingPage = () => {
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              Connect{" "}
+              Bridging{" "}
               <span className="bg-gradient-to-r from-red-200 to-red-300 bg-clip-text text-transparent">
                 Blood Donors
               </span>{" "}
-              with Those in Need
+              with Every Life That Needs Them
             </h1>
 
             <p className="text-lg md:text-xl text-red-100 mb-8 max-w-2xl mx-auto">
-              VitalBridge streamlines blood donation, inventory management, and hospital requests through a secure, modern platform.
+              VitalBridge is a modern platform that simplifies blood donation, inventory management, and hospital requests through one secure, connected system.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
