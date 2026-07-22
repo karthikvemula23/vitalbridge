@@ -53,14 +53,13 @@ const socialLinks = [
                 </h2>
 
                 <p className="text-sm text-gray-400">
-                  Blood Bank Management Platform
+                  Smart Blood Donation Platform
                 </p>
               </div>
             </Link>
 
             <p className="text-gray-400 mt-4 max-w-md">
-              A modern MERN application for managing blood donors,
-              inventory, hospitals, and emergency blood requests.
+              A modern MERN application that connects donors, recipients, and healthcare organizations through secure blood donation, inventory, and request management.
             </p>
           </div>
 
