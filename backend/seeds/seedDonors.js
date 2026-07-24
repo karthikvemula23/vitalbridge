@@ -12,7 +12,7 @@ mongoose
 const donors = [
   {
     fullName: "Rahul Kumar",
-    email: "rahul.kumar@example.com",
+    email: "rahul.kumar@gmail.com",
     password: "Password@123",
     phone: "9876543210",
     role: "donor",
@@ -23,7 +23,7 @@ const donors = [
       pincode: "500001",
     },
     bloodGroup: "O+",
-    age: 25,
+    age: 21,
     gender: "Male",
     weight: 72,
     eligibleToDonate: true,
@@ -31,7 +31,7 @@ const donors = [
 
   {
     fullName: "Priya Sharma",
-    email: "priya.sharma@example.com",
+    email: "priya.sharma@gmail.com",
     password: "Password@123",
     phone: "9123456789",
     role: "donor",
@@ -50,7 +50,7 @@ const donors = [
 
 {
     fullName: "Arjun Reddy",
-    email: "arjun.reddy@example.com",
+    email: "arjun.reddy@gmail.com",
     password: "Password@123",
     phone: "9012345678",
     role: "donor",
@@ -68,7 +68,7 @@ const donors = [
   },
   {
     fullName: "Sneha Patel",
-    email: "sneha.patel@example.com",
+    email: "sneha.patel@gmail.com",
     password: "Password@123",
     phone: "8899123456",
     role: "donor",
@@ -86,7 +86,7 @@ const donors = [
   },
   {
     fullName: "Rohit Verma",
-    email: "rohit.verma@example.com",
+    email: "rohit.verma@gmail.com",
     password: "Password@123",
     phone: "9345678901",
     role: "donor",
@@ -104,7 +104,7 @@ const donors = [
   },
   {
     fullName: "Neha Iyer",
-    email: "neha.iyer@example.com",
+    email: "neha.iyer@gmail.com",
     password: "Password@123",
     phone: "9988776655",
     role: "donor",
@@ -122,7 +122,7 @@ const donors = [
   },
   {
     fullName: "Vikram Singh",
-    email: "vikram.singh@example.com",
+    email: "vikram.singh@gmail.com",
     password: "Password@123",
     phone: "9871203456",
     role: "donor",
@@ -140,7 +140,7 @@ const donors = [
   },
   {
     fullName: "Aisha Khan",
-    email: "aisha.khan@example.com",
+    email: "aisha.khan@gmail.com",
     password: "Password@123",
     phone: "9898981234",
     role: "donor",
@@ -158,7 +158,7 @@ const donors = [
   },
   {
     fullName: "Karthik Nair",
-    email: "karthik.nair@example.com",
+    email: "karthik.nair@gmail.com",
     password: "Password@123",
     phone: "9874501234",
     role: "donor",
@@ -176,7 +176,7 @@ const donors = [
   },
   {
     fullName: "Pooja Mehta",
-    email: "pooja.mehta@example.com",
+    email: "pooja.mehta@gmail.com",
     password: "Password@123",
     phone: "9988123456",
     role: "donor",
@@ -194,7 +194,7 @@ const donors = [
   },
   {
     fullName: "Sandeep Rao",
-    email: "sandeep.rao@example.com",
+    email: "sandeep.rao@gmail.com",
     password: "Password@123",
     phone: "9876112233",
     role: "donor",
@@ -212,7 +212,7 @@ const donors = [
   },
   {
     fullName: "Ananya Das",
-    email: "ananya.das@example.com",
+    email: "ananya.das@gmail.com",
     password: "Password@123",
     phone: "9812345670",
     role: "donor",
@@ -230,7 +230,7 @@ const donors = [
   },
   {
     fullName: "Naveen Chandra",
-    email: "naveen.chandra@example.com",
+    email: "naveen.chandra@gmail.com",
     password: "Password@123",
     phone: "9955667788",
     role: "donor",
@@ -248,7 +248,7 @@ const donors = [
   },
   {
     fullName: "Divya Joshi",
-    email: "divya.joshi@example.com",
+    email: "divya.joshi@gmail.com",
     password: "Password@123",
     phone: "9900112233",
     role: "donor",
@@ -266,7 +266,7 @@ const donors = [
   },
   {
     fullName: "Harish Gowda",
-    email: "harish.gowda@example.com",
+    email: "harish.gowda@gmail.com",
     password: "Password@123",
     phone: "9873216540",
     role: "donor",
@@ -284,7 +284,7 @@ const donors = [
   },
   {
     fullName: "Ritu Malhotra",
-    email: "ritu.malhotra@example.com",
+    email: "ritu.malhotra@gmail.com",
     password: "Password@123",
     phone: "9811198765",
     role: "donor",
@@ -302,7 +302,7 @@ const donors = [
   },
   {
     fullName: "Aditya Kulkarni",
-    email: "aditya.kulkarni@example.com",
+    email: "aditya.kulkarni@gmail.com",
     password: "Password@123",
     phone: "9890011223",
     role: "donor",
@@ -320,7 +320,7 @@ const donors = [
   },
   {
     fullName: "Meera Ramesh",
-    email: "meera.ramesh@example.com",
+    email: "meera.ramesh@gmail.com",
     password: "Password@123",
     phone: "9845012345",
     role: "donor",
@@ -338,7 +338,7 @@ const donors = [
   },
   {
     fullName: "Pranav Mishra",
-    email: "pranav.mishra@example.com",
+    email: "pranav.mishra@gmail.com",
     password: "Password@123",
     phone: "9877771122",
     role: "donor",
@@ -356,7 +356,7 @@ const donors = [
   },
   {
     fullName: "Kavya Reddy",
-    email: "kavya.reddy@example.com",
+    email: "kavya.reddy@gmail.com",
     password: "Password@123",
     phone: "9888881234",
     role: "donor",
@@ -372,17 +372,43 @@ const donors = [
     weight: 55,
     eligibleToDonate: true,
   },
+  
 ];
 
 const seedDonors = async () => {
   try {
-    // Remove all existing donors
+    // Delete all existing donors
     await Donor.deleteMany({});
+    console.log("🗑️ All donors deleted.");
 
-    // Insert new donors
-    await Donor.insertMany(donors);
+    let added = 0;
+    let updated = 0;
 
-    console.log(`✅ ${donors.length} donors seeded successfully!`);
+    for (const donor of donors) {
+      const existing = await Donor.findOne({ email: donor.email });
+
+      if (!existing) {
+        await new Donor(donor).save();
+        added++;
+      } else {
+        existing.fullName = donor.fullName;
+        existing.phone = donor.phone;
+        existing.address = donor.address;
+        existing.bloodGroup = donor.bloodGroup;
+        existing.age = donor.age;
+        existing.gender = donor.gender;
+        existing.weight = donor.weight;
+        existing.eligibleToDonate = donor.eligibleToDonate;
+
+        // Leave password and history untouched
+        await existing.save();
+        updated++;
+      }
+    }
+
+    console.log("✅ Donor seeding completed!");
+    console.log(`➕ Added: ${added}`);
+    console.log(`🔄 Updated: ${updated}`);
 
     process.exit();
   } catch (error) {
@@ -392,3 +418,43 @@ const seedDonors = async () => {
 };
 
 seedDonors();
+
+// const seedDonors = async () => {
+//   try {
+//     let added = 0;
+//     let updated = 0;
+
+//     for (const donor of donors) {
+//       const existing = await Donor.findOne({ email: donor.email });
+
+//       if (!existing) {
+//         await new Donor(donor).save();
+//         added++;
+//       } else {
+//         existing.fullName = donor.fullName;
+//         existing.phone = donor.phone;
+//         existing.address = donor.address;
+//         existing.bloodGroup = donor.bloodGroup;
+//         existing.age = donor.age;
+//         existing.gender = donor.gender;
+//         existing.weight = donor.weight;
+//         existing.eligibleToDonate = donor.eligibleToDonate;
+
+//         // Leave password and history untouched
+//         await existing.save();
+//         updated++;
+//       }
+//     }
+
+//     console.log("✅ Donor seeding completed!");
+//     console.log(`➕ Added: ${added}`);
+//     console.log(`🔄 Updated: ${updated}`);
+
+//     process.exit();
+//   } catch (error) {
+//     console.error(error);
+//     process.exit(1);
+//   }
+// };
+
+// seedDonors();
