@@ -308,15 +308,12 @@ const DashboardLayout = ({ userRole = "donor" }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-red-50 to-white">
+    <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
       {/* HEADER */}
       <header
-        className={`flex justify-between items-center bg-white/95 backdrop-blur-md shadow-sm border-b border-red-100 px-4 sm:px-6 py-3 sticky top-0 z-50 transition-all duration-300 ${
+        className={`flex justify-between items-center bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 sm:px-6 py-3 sticky top-0 z-50 transition-all duration-300 ${
           isScrolled ? "shadow-lg" : "shadow-sm"
         }`}
-        style={{
-          background: `linear-gradient(135deg, ${theme.primary[50]} 0%, white 50%, ${theme.primary[50]} 100%)`,
-        }}
       >
         {/* Left Section */}
         <div className="flex items-center gap-3">
@@ -330,28 +327,19 @@ const DashboardLayout = ({ userRole = "donor" }) => {
 
           {/* Logo and Title */}
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-red-100 shadow-sm">
-              <ClipboardPlus size={20} className="text-red-600" />
+            <div className="p-2 rounded-xl bg-gradient-to-br from-red-600 to-red-800 shadow-md shadow-red-200">
+              <ClipboardPlus size={20} className="text-white" />
             </div>
             <div className="hidden sm:block">
-              <h1
-                className="text-lg sm:text-xl font-bold"
-                style={{ color: theme.primary[700] }}
-              >
+              <h1 className="text-base sm:text-lg font-extrabold text-gray-900 leading-tight">
                 {config.title}
               </h1>
-              <p
-                className="text-xs sm:text-sm"
-                style={{ color: theme.secondary[500] }}
-              >
+              <p className="text-xs text-gray-400">
                 {config.subtitle}
               </p>
             </div>
             <div className="sm:hidden">
-              <h1
-                className="text-lg font-bold"
-                style={{ color: theme.primary[700] }}
-              >
+              <h1 className="text-lg font-extrabold text-gray-900">
                 {config.shortTitle}
               </h1>
             </div>
@@ -362,27 +350,16 @@ const DashboardLayout = ({ userRole = "donor" }) => {
         <div className="flex items-center gap-2 sm:gap-4">
           {/* User Profile */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <div
-              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg border-2 border-white"
-              style={{
-                background: `linear-gradient(135deg, ${theme.primary[500]}, ${theme.primary[600]})`,
-              }}
-            >
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold shadow-md ring-2 ring-red-200 bg-gradient-to-br from-red-500 to-red-700">
               {userData?.name?.charAt(0)?.toUpperCase() ||
                 userData?.fullName?.charAt(0)?.toUpperCase() ||
                 "U"}
             </div>
             <div className="hidden sm:block text-right">
-              <span
-                className="font-medium block text-sm"
-                style={{ color: theme.primary[700] }}
-              >
+              <span className="font-semibold block text-sm text-gray-900">
                 {userData?.name || userData.fullName || "User"}
               </span>
-              <span
-                className="text-xs capitalize"
-                style={{ color: theme.secondary[500] }}
-              >
+              <span className="text-xs capitalize text-gray-400">
                 {userRole.replace("_", " ")}
               </span>
             </div>
@@ -408,29 +385,20 @@ const DashboardLayout = ({ userRole = "donor" }) => {
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           } lg:translate-x-0 fixed lg:static inset-y-0 left-0 z-40 ${
             sidebarCollapsed ? "w-16" : "w-64"
-          } bg-white shadow-xl border-r border-red-100 transition-all duration-300 flex flex-col transform lg:transform-none`}
-          style={{
-            background: `linear-gradient(to bottom, ${theme.primary[50]}, white)`,
-          }}
+          } bg-white shadow-xl border-r border-gray-100 transition-all duration-300 flex flex-col transform lg:transform-none`}
         >
           {/* Sidebar Header */}
-          <div className="flex items-center justify-between p-4 border-b border-red-100">
+          <div className="flex items-center justify-between p-4 border-b border-gray-100">
             {!sidebarCollapsed && (
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-red-100">
-                  <config.icon size={20} className="text-red-600" />
+                <div className="p-2 rounded-xl bg-gradient-to-br from-red-600 to-red-800 shadow-md shadow-red-200">
+                  <config.icon size={18} className="text-white" />
                 </div>
                 <div>
-                  <h2
-                    className="font-bold text-sm"
-                    style={{ color: theme.primary[700] }}
-                  >
+                  <h2 className="font-extrabold text-sm text-gray-900 leading-tight">
                     {config.shortTitle}
                   </h2>
-                  <p
-                    className="text-xs"
-                    style={{ color: theme.secondary[500] }}
-                  >
+                  <p className="text-xs text-gray-400">
                     Portal
                   </p>
                 </div>
@@ -438,8 +406,7 @@ const DashboardLayout = ({ userRole = "donor" }) => {
             )}
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="hidden lg:flex p-1.5 rounded-lg hover:bg-red-100 transition-colors"
-              style={{ color: theme.primary[600] }}
+              className="hidden lg:flex p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-500"
             >
               {sidebarCollapsed ? (
                 <ChevronRight size={16} />
@@ -450,8 +417,8 @@ const DashboardLayout = ({ userRole = "donor" }) => {
           </div>
 
           {/* Navigation Menu */}
-          <nav className="flex-1 p-4 overflow-y-auto">
-            <div className="flex flex-col gap-1">
+          <nav className="flex-1 p-3 overflow-y-auto">
+            <div className="flex flex-col gap-0.5">
               {config.items.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
@@ -464,35 +431,27 @@ const DashboardLayout = ({ userRole = "donor" }) => {
                     }}
                     className={`flex items-center gap-3 w-full p-3 rounded-xl transition-all duration-200 relative group ${
                       isActive
-                        ? "shadow-md font-semibold transform scale-[1.02]"
-                        : "hover:shadow-md hover:transform hover:scale-[1.02] hover:bg-red-50"
-                    } ${
-                      isActive
-                        ? "text-white"
-                        : "text-gray-700 hover:text-red-700"
+                        ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md shadow-red-200/50"
+                        : "text-gray-600 hover:bg-red-50 hover:text-red-700"
                     }`}
-                    style={{
-                      background: isActive
-                        ? `linear-gradient(135deg, ${theme.primary[500]}, ${theme.primary[600]})`
-                        : "transparent",
-                    }}
                     title={sidebarCollapsed ? item.label : ""}
                   >
                     <Icon
-                      size={20}
-                      className="flex-shrink-0"
-                      style={{
-                        color: isActive ? "white" : theme.primary[600],
-                      }}
+                      size={18}
+                      className={`flex-shrink-0 transition-colors duration-200 ${
+                        isActive ? "text-white" : "text-red-500 group-hover:text-red-600"
+                      }`}
                     />
                     {!sidebarCollapsed && (
                       <>
-                        <span className="flex-1 text-left whitespace-nowrap text-sm">
+                        <span className={`flex-1 text-left whitespace-nowrap text-sm font-medium ${
+                          isActive ? "text-white" : ""
+                        }`}>
                           {item.label}
                         </span>
                         {item.badge && (
                           <span
-                            className={`px-2 py-1 text-xs rounded-full ${getBadgeColor(item.badge)}`}
+                            className={`px-2 py-0.5 text-xs rounded-full font-semibold ${getBadgeColor(item.badge)}`}
                           >
                             {item.badge}
                           </span>
@@ -505,12 +464,7 @@ const DashboardLayout = ({ userRole = "donor" }) => {
                       />
                     )}
                     {sidebarCollapsed && (
-                      <div
-                        className="absolute left-full ml-2 px-3 py-2 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50 shadow-lg"
-                        style={{
-                          background: `linear-gradient(135deg, ${theme.primary[600]}, ${theme.primary[700]})`,
-                        }}
-                      >
+                      <div className="absolute left-full ml-2 px-3 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50 shadow-lg">
                         {item.label}
                         {item.badge && ` (${item.badge})`}
                       </div>
@@ -523,17 +477,11 @@ const DashboardLayout = ({ userRole = "donor" }) => {
 
           {/* Footer Section */}
           {!sidebarCollapsed && (
-            <div className="p-4 border-t border-red-100">
-              <div
-                className="p-3 rounded-lg text-center"
-                style={{
-                  background: theme.primary[100],
-                  color: theme.primary[700],
-                }}
-              >
-                <p className="text-sm font-semibold">Blood Bank MS</p>
-                <p className="text-xs mt-1 opacity-75">
-                  Save Lives, Donate Blood
+            <div className="p-3 border-t border-gray-100">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-red-600 to-red-800 text-center shadow-md">
+                <p className="text-sm font-bold text-white">VitalBridge</p>
+                <p className="text-xs mt-0.5 text-red-200">
+                  Save Lives · Donate Blood
                 </p>
               </div>
             </div>
@@ -556,14 +504,14 @@ const DashboardLayout = ({ userRole = "donor" }) => {
       {/* MOBILE OVERLAY (omitted for brevity) */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30 lg:hidden"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Mobile Footer Navigation (omitted for brevity) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-red-100 shadow-lg z-40">
-        <div className="flex justify-around items-center p-2">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-xl z-40">
+        <div className="flex justify-around items-center px-2 py-1.5">
           {config.items.slice(0, 4).map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -571,12 +519,16 @@ const DashboardLayout = ({ userRole = "donor" }) => {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className={`flex flex-col items-center p-2 rounded-lg transition-all duration-200 flex-1 mx-1 ${
-                  isActive ? "bg-red-50 text-red-600" : "text-gray-600"
+                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 flex-1 mx-0.5 ${
+                  isActive
+                    ? "bg-red-50 text-red-600"
+                    : "text-gray-500 hover:text-red-600"
                 }`}
               >
-                <Icon size={20} />
-                <span className="text-xs mt-1">{item.label.split(" ")[0]}</span>
+                <Icon size={19} />
+                <span className={`text-xs mt-1 font-medium ${
+                  isActive ? "text-red-600" : "text-gray-500"
+                }`}>{item.label.split(" ")[0]}</span>
               </button>
             );
           })}
