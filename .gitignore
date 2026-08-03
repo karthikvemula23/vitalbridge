@@ -25,3 +25,6 @@ dist-ssr
 VitalBridgeStructure.txt
 # Environment Variables
 .env
+
+# AI Development Context (local only)
+/AI_CONTEXT/
