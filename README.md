@@ -1,36 +1,117 @@
 # 🩸 VitalBridge
 
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
-![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js)
-![MongoDB](https://img.shields.io/badge/MongoDB-Database-47A248?logo=mongodb)
-![License](https://img.shields.io/badge/License-MIT-blue)
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" />
+  <img src="https://img.shields.io/badge/Node.js-Express-339933?logo=node.js" />
+  <img src="https://img.shields.io/badge/MongoDB-Database-47A248?logo=mongodb" />
+  <img src="https://img.shields.io/badge/TailwindCSS-3-38BDF8?logo=tailwindcss" />
+  <img src="https://img.shields.io/badge/License-MIT-blue" />
+</p>
 
-A full-stack blood bank and donor management platform built with the MERN stack to streamline blood donation, inventory management, and hospital requests.
+A modern **AI-ready Blood Bank Management System** built using the **MERN Stack** that connects **Donors, Blood Banks, Hospitals, Blood Laboratories, and Administrators** on a centralized platform for efficient blood donation and emergency blood request management.
 
 ---
 
 # Overview
 
-**VitalBridge** is a centralized blood bank management system designed to improve the efficiency of blood donation services by connecting administrators, donors, and hospitals on a single platform.
+VitalBridge is a full-stack web application designed to digitize and simplify blood bank operations.
 
-The application simplifies donor registration, blood inventory management, hospital request processing, and administrative operations while maintaining secure authentication and accurate record management.
+The platform streamlines donor registration, blood inventory management, blood request processing, facility verification, and administrative workflows while maintaining secure authentication and role-based authorization.
 
-Developed using the MERN stack, VitalBridge demonstrates modern full-stack development practices including RESTful API design, JWT authentication, responsive UI development, and scalable MongoDB data management.
+It is built with scalability in mind and serves as a foundation for future AI-powered healthcare services.
 
 ---
 
-# Features
+# Key Features
 
-- Secure JWT-based authentication
-- Role-based access control
-- Donor registration and profile management
-- Hospital registration with administrator approval
-- Blood inventory management
-- Blood request creation and tracking
-- Administrative dashboard
-- Responsive user interface
-- RESTful API architecture
-- MongoDB database integration
+## Authentication & Security
+
+- JWT Authentication
+- Password Encryption (bcrypt)
+- Protected Routes
+- Role-Based Authorization
+
+---
+
+## Donor Portal
+
+- Register as Donor
+- Manage Profile
+- View Donation History
+- Submit Blood Donations
+- Track Requests
+
+---
+
+## Hospital Portal
+
+- Register Hospital
+- Request Blood Units
+- Track Request Status
+- Manage Blood Requirements
+
+---
+
+## Blood Bank Portal
+
+- Blood Inventory Management
+- Blood Stock Updates
+- Accept / Reject Requests
+- Blood Availability Tracking
+
+---
+
+## Blood Laboratory
+
+- Blood Testing Records
+- Blood Unit Verification
+- Inventory Updates
+
+---
+
+## Admin Portal
+
+- Dashboard Analytics
+- Facility Verification
+- User Management
+- Hospital Approval
+- Blood Bank Approval
+- System Monitoring
+
+---
+
+# Planned AI Features
+
+The next version of VitalBridge will include AI-powered healthcare assistance.
+
+### AI Chat Assistant
+
+- Google Gemini / OpenAI Integration
+- Donor Assistance
+- Blood Donation FAQs
+- Hospital Support
+- Blood Eligibility Guidance
+
+### Smart Emergency Alerts
+
+- Automatic email notifications
+- Notify eligible donors
+- Notify nearby blood banks
+- Emergency blood shortage alerts
+
+### AI Recommendations
+
+- Blood demand prediction
+- Donor matching
+- Inventory optimization
+- Smart analytics
+
+### Donation Certificate Generator
+
+- Automatic PDF generation
+- QR Verification
+- Digital certificates
+- Email delivery
 
 ---
 
@@ -50,8 +131,31 @@ Developed using the MERN stack, VitalBridge demonstrates modern full-stack devel
 - Express.js
 - MongoDB
 - Mongoose
-- JWT Authentication
+- JWT
 - bcrypt
+
+---
+
+# Project Architecture
+
+```text
+Users
+│
+├── Donor
+├── Hospital
+├── Blood Bank
+├── Blood Lab
+└── Admin
+        │
+        ▼
+ React Frontend (Vite)
+        │
+ REST API
+        │
+Express.js Backend
+        │
+MongoDB Atlas
+```
 
 ---
 
@@ -59,121 +163,119 @@ Developed using the MERN stack, VitalBridge demonstrates modern full-stack devel
 
 ```text
 vitalbridge/
-│
-├── backend/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── openapi/
-│   ├── seedAdmin.js
-│   ├── server.js
-│   └── package.json
-│
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   ├── package.json
-│   └── vite.config.js
-│
-├── .gitignore
-└── README.md
+
+backend/
+├── controllers/
+├── middleware/
+├── models/
+├── openapi/
+├── routes/
+├── seedAdmin.js
+├── server.js
+└── package.json
+
+frontend/
+├── public/
+├── src/
+│   ├── components/
+│   ├── layouts/
+│   ├── pages/
+│   ├── services/
+│   └── assets/
+├── package.json
+└── vite.config.js
+
+README.md
+.gitignore
 ```
 
 ---
+
 
 # Getting Started
 
 ## Prerequisites
 
-Make sure you have installed:
-
-- Node.js (v18 or later)
+- Node.js 18+
 - npm
-- MongoDB Atlas account (or local MongoDB)
+- MongoDB Atlas
 - Git
 
 ---
 
-## Clone the Repository
+## Clone Repository
 
 ```bash
-git clone https://github.com/<your-username>/vitalbridge.git
+git clone https://github.com/karthikvemula23/vitalbridge.git
 
 cd vitalbridge
 ```
 
 ---
 
-## Backend Setup
-
-Navigate to the backend directory.
+# Backend Setup
 
 ```bash
 cd backend
-```
 
-Install dependencies.
-
-```bash
 npm install
 ```
 
-Create a `.env` file.
+Create a `.env` file:
 
 ```env
 PORT=5000
+
 MONGO_URI=your_mongodb_connection_string
+
 JWT_SECRET=your_secret_key
-```
-
-Start the backend server.
-
-```bash
-npm run dev
-```
-
-or
-
-```bash
-npm start
 ```
 
 ---
 
-## Seed the Admin Account
+## Seed Administrator
 
-Run the admin seed script.
+Update `backend/seedAdmin.js` if necessary.
 
 ```bash
 node seedAdmin.js
 ```
 
-This creates the default administrator account for accessing the admin dashboard.
-
 ---
 
-## Frontend Setup
+## Run Backend
 
-Open a new terminal.
-
-```bash
-cd frontend
-```
-
-Install dependencies.
-
-```bash
-npm install
-```
-
-Start the development server.
+Development
 
 ```bash
 npm run dev
 ```
 
-The application will be available at:
+Production
+
+```bash
+npm start
+```
+
+Backend
+
+```
+http://localhost:5000
+```
+
+---
+
+# Frontend Setup
+
+```bash
+cd frontend
+
+npm install
+
+npm run dev
+```
+
+Frontend
 
 ```
 http://localhost:5173
@@ -181,61 +283,71 @@ http://localhost:5173
 
 ---
 
-# API Overview
+# API Documentation
 
-The backend provides RESTful APIs for:
+Swagger/OpenAPI documentation is available after starting the backend.
 
-- Authentication
-- Donor Management
-- Hospital Management
-- Blood Inventory
-- Blood Requests
-- Administrative Operations
+```
+http://localhost:5000/api-docs
+```
 
 ---
 
-# Future Improvements
+# REST APIs
 
-Potential enhancements include:
+Current modules include:
 
-- Email notifications
-- Blood donation scheduling
-- Analytics dashboard
-- Real-time inventory updates
-- Mobile application support
+- Authentication
+- Donors
+- Hospitals
+- Blood Banks
+- Blood Laboratories
+- Blood Inventory
+- Blood Requests
+- Facility Verification
+- Administration
+
+---
+
+# Future Roadmap
+
+- AI Chatbot (Gemini/OpenAI)
+- Email Notifications
+- SMS Notifications
+- Donation Certificate Generator
+- Blood Demand Prediction
+- Real-Time Notifications
+- AI Analytics Dashboard
+- Mobile Application
+- QR Code Verification
+- GIS-Based Nearby Donor Search
+- Multi-language Support
 
 ---
 
 # Contributing
 
-Contributions are welcome.
+1. Fork the repository
 
-1. Fork the repository.
-2. Create a feature branch.
-
-```bash
-git checkout -b feature/your-feature
-```
-
-3. Commit your changes.
+2. Create a feature branch
 
 ```bash
-git commit -m "Add your feature"
+git checkout -b feature/new-feature
 ```
 
-4. Push the branch.
+3. Commit changes
 
 ```bash
-git push origin feature/your-feature
+git commit -m "feat: add new feature"
 ```
 
-5. Open a Pull Request.
+4. Push
 
----
+```bash
+git push origin feature/new-feature
+```
 
-# License
-
-This project is licensed under the MIT License.
+5. Open a Pull Request
 
 ---
 
@@ -243,75 +355,13 @@ This project is licensed under the MIT License.
 
 **Vemula Karthik**
 
-GitHub: https://github.com/karthikvemula23Create a `.env` file inside the `backend` directory.
+GitHub
 
-```env
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-PORT=5000
-```
+https://github.com/karthikvemula23
 
----
+LinkedIn
 
-## Seed the Administrator Account
-
-Before starting the backend server for the first time, create the administrator account.
-
-Open:
-
-```text
-backend/seedAdmin.js
-```
-
-Update the administrator credentials if required, then run:
-
-```bash
-node seedAdmin.js
-```
-
-This will create the initial administrator account in the database.
-
----
-
-## Start the Backend Server
-
-```bash
-npm start
-```
-
-The backend will be available at:
-
-```text
-http://localhost:5000
-```
-
----
-
-## Frontend Setup
-
-Open a new terminal and navigate to the frontend directory.
-
-```bash
-cd frontend
-```
-
-Install the required dependencies:
-
-```bash
-npm install
-```
-
-Start the development server:
-
-```bash
-npm run dev
-```
-
-The frontend will be available at:
-
-```text
-http://localhost:5173
-```
+https://www.linkedin.com/in/vemula-karthik-4a3309363/
 
 ---
 
