@@ -28,3 +28,6 @@ VitalBridgeStructure.txt
 
 # AI Development Context (local only)
 /AI_CONTEXT/
+
+# Session notes (local AI context, never committed)
+/.session-notes/

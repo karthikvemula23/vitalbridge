@@ -18,6 +18,116 @@ import {
   Activity,
 } from "lucide-react";
 
+// ─── Module-level sub-components ─────────────────────────────────────────────
+
+const getStatusBadge = (status) => {
+  const statusConfig = {
+    pending: {
+      color: "bg-amber-50 text-amber-700 border-amber-200",
+      icon: Clock,
+      label: "Pending Review",
+    },
+    approved: {
+      color: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      icon: CheckCircle,
+      label: "Approved",
+    },
+    rejected: {
+      color: "bg-red-50 text-red-700 border-red-200",
+      icon: XCircle,
+      label: "Rejected",
+    },
+  };
+
+  const config = statusConfig[status] || statusConfig.pending;
+  const Icon = config.icon;
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${config.color}`}
+    >
+      <Icon size={12} />
+      {config.label}
+    </span>
+  );
+};
+
+const getFacilityTypeBadge = (type) => {
+  const isHospital = type === "Hospital";
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${
+        isHospital
+          ? "bg-blue-50 text-blue-700 border-blue-200"
+          : "bg-violet-50 text-violet-700 border-violet-200"
+      }`}
+    >
+      <Building size={12} />
+      {type || "Facility"}
+    </span>
+  );
+};
+
+const KpiCard = ({ icon, label, value, color = "red" }) => {
+  const colorClasses = {
+    red: {
+      iconBg: "bg-red-50",
+      iconText: "text-red-600",
+      iconHover: "group-hover:bg-red-600 group-hover:text-white",
+    },
+    amber: {
+      iconBg: "bg-amber-50",
+      iconText: "text-amber-600",
+      iconHover: "group-hover:bg-amber-600 group-hover:text-white",
+    },
+    green: {
+      iconBg: "bg-emerald-50",
+      iconText: "text-emerald-600",
+      iconHover: "group-hover:bg-emerald-600 group-hover:text-white",
+    },
+    blue: {
+      iconBg: "bg-blue-50",
+      iconText: "text-blue-600",
+      iconHover: "group-hover:bg-blue-600 group-hover:text-white",
+    },
+  };
+  const c = colorClasses[color] || colorClasses.red;
+
+  return (
+    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+      <div className="flex items-center justify-between mb-3">
+        <div
+          className={`p-2 ${c.iconBg} ${c.iconText} rounded-xl ${c.iconHover} transition-all duration-300`}
+        >
+          {icon}
+        </div>
+        <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+          {label}
+        </span>
+      </div>
+      <p className="text-3xl font-black text-gray-900 tracking-tight">
+        {value}
+      </p>
+    </div>
+  );
+};
+
+const SectionHeading = ({ icon, eyebrow, title }) => (
+  <div className="mb-5">
+    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">
+      {eyebrow}
+    </p>
+    <div className="flex items-center gap-2.5">
+      <div className="p-1.5 bg-red-50 rounded-lg text-red-600 flex-shrink-0">
+        {icon}
+      </div>
+      <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+    </div>
+  </div>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 const FacilityApproval = () => {
   const [facilities, setFacilities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -191,54 +301,6 @@ const FacilityApproval = () => {
     document.body.removeChild(link);
   };
 
-  const getStatusBadge = (status) => {
-    const statusConfig = {
-      pending: {
-        color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-        icon: Clock,
-        label: "Pending Review",
-      },
-      approved: {
-        color: "bg-green-100 text-green-800 border-green-200",
-        icon: CheckCircle,
-        label: "Approved",
-      },
-      rejected: {
-        color: "bg-red-100 text-red-800 border-red-200",
-        icon: XCircle,
-        label: "Rejected",
-      },
-    };
-
-    const config = statusConfig[status] || statusConfig.pending;
-    const Icon = config.icon;
-
-    return (
-      <span
-        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ${config.color}`}
-      >
-        <Icon size={12} />
-        {config.label}
-      </span>
-    );
-  };
-
-  const getFacilityTypeBadge = (type) => {
-    const isHospital = type === "Hospital";
-    return (
-      <span
-        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ${
-          isHospital
-            ? "bg-blue-100 text-blue-800 border-blue-200"
-            : "bg-purple-100 text-purple-800 border-purple-200"
-        }`}
-      >
-        <Building size={12} />
-        {type || "Facility"}
-      </span>
-    );
-  };
-
   // ─── Loading State ────────────────────────────────────────────────────────────
   if (loading) {
     return (
@@ -260,68 +322,6 @@ const FacilityApproval = () => {
       </div>
     );
   }
-
-  // ─── Sub-Components ───────────────────────────────────────────────────────────
-
-  // KPI stat mini-card — matches Dashboard's quick stats row
-  const KpiCard = ({ icon, label, value, color = "red" }) => {
-    const colorClasses = {
-      red: {
-        iconBg: "bg-red-50",
-        iconText: "text-red-600",
-        iconHover: "group-hover:bg-red-600 group-hover:text-white",
-      },
-      amber: {
-        iconBg: "bg-amber-50",
-        iconText: "text-amber-600",
-        iconHover: "group-hover:bg-amber-600 group-hover:text-white",
-      },
-      green: {
-        iconBg: "bg-emerald-50",
-        iconText: "text-emerald-600",
-        iconHover: "group-hover:bg-emerald-600 group-hover:text-white",
-      },
-      blue: {
-        iconBg: "bg-blue-50",
-        iconText: "text-blue-600",
-        iconHover: "group-hover:bg-blue-600 group-hover:text-white",
-      },
-    };
-    const c = colorClasses[color] || colorClasses.red;
-
-    return (
-      <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-        <div className="flex items-center justify-between mb-3">
-          <div
-            className={`p-2 ${c.iconBg} ${c.iconText} rounded-xl ${c.iconHover} transition-all duration-300`}
-          >
-            {icon}
-          </div>
-          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
-            {label}
-          </span>
-        </div>
-        <p className="text-3xl font-black text-gray-900 tracking-tight">
-          {value}
-        </p>
-      </div>
-    );
-  };
-
-  // Section heading — identical to Dashboard's SectionHeading
-  const SectionHeading = ({ icon, eyebrow, title }) => (
-    <div className="mb-5">
-      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">
-        {eyebrow}
-      </p>
-      <div className="flex items-center gap-2.5">
-        <div className="p-1.5 bg-red-50 rounded-lg text-red-600 flex-shrink-0">
-          {icon}
-        </div>
-        <h2 className="text-xl font-bold text-gray-900">{title}</h2>
-      </div>
-    </div>
-  );
 
   // ─── Main Render ──────────────────────────────────────────────────────────────
   return (
