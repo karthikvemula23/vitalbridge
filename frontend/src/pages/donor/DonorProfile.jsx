@@ -1,55 +1,77 @@
-import { useEffect, useState, useCallback } from "react";
+﻿import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 import {
-  Loader2,
-  Save,
-  Edit3,
-  X,
-  MapPin,
-  Mail,
-  Phone,
-  User,
-  Shield,
-  Heart,
-  Droplet,
-  Calendar,
-  Scale,
-  Droplets,
-  VenusAndMars,
-  Award,
-  Clock,
-  Tag,
-  AlertCircle,
-  RefreshCw,
-  CheckCircle2,
+  Loader2, Save, Edit3, X, MapPin, Mail, Phone,
+  User, Heart, Droplet, Calendar, Award, Clock,
+  AlertCircle, CheckCircle, RefreshCw, Shield,
 } from "lucide-react";
 
 const API_BASE_URL = "/api";
-
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 const GENDER_OPTIONS = [
   { value: "male", label: "Male" },
   { value: "female", label: "Female" },
-  { value: "other", label: "Other" }
+  { value: "other", label: "Other" },
 ];
+
+const SectionHeading = ({ icon, eyebrow, title }) => (
+  <div className="mb-5">
+    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">{eyebrow}</p>
+    <div className="flex items-center gap-2.5">
+      <div className="p-1.5 bg-red-50 rounded-lg text-red-600 flex-shrink-0">{icon}</div>
+      <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+    </div>
+  </div>
+);
+
+const FieldLabel = ({ children }) => (
+  <label className="block text-xs font-semibold uppercase tracking-widest text-gray-500 mb-1.5">
+    {children}
+  </label>
+);
+
+const iB = "w-full px-4 py-2.5 rounded-xl border-2 text-sm text-gray-800 transition-all duration-200 outline-none";
+const iE = "border-gray-200 bg-white focus:border-red-500 focus:ring-2 focus:ring-red-100";
+const iD = "border-gray-100 bg-gray-50 text-gray-600 cursor-default";
+
+const FormInput = ({ isEditing, error, ...props }) => (
+  <div>
+    <input {...props} disabled={!isEditing}
+      className={`${iB} ${isEditing ? iE : iD} ${error ? "border-red-400" : ""}`} />
+    {error && <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1"><AlertCircle size={11}/>{error}</p>}
+  </div>
+);
+
+const FormSelect = ({ isEditing, error, children, ...props }) => (
+  <div>
+    <select {...props} disabled={!isEditing}
+      className={`${iB} ${isEditing ? iE : iD} ${error ? "border-red-400" : ""}`}>
+      {children}
+    </select>
+    {error && <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1"><AlertCircle size={11}/>{error}</p>}
+  </div>
+);
+
+const StatusBadge = ({ status }) => {
+  const map = {
+    active: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    pending: "bg-amber-50 text-amber-700 border-amber-200",
+    inactive: "bg-red-50 text-red-700 border-red-200",
+  };
+  return (
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${map[status] || map.inactive}`}>
+      {status === "active" ? <CheckCircle size={10}/> : <Clock size={10}/>}
+      {status?.charAt(0).toUpperCase() + status?.slice(1)}
+    </span>
+  );
+};
 
 const DonorProfile = () => {
   const [donor, setDonor] = useState(null);
   const [formData, setFormData] = useState({
-    fullName: "",
-    phone: "",
-    age: "",
-    gender: "",
-    weight: "",
-    bloodGroup: "",
-    address: {
-      street: "",
-      city: "",
-      state: "",
-      pincode: "",
-    },
-    password: ""
+    fullName: "", phone: "", age: "", gender: "", weight: "", bloodGroup: "",
+    address: { street: "", city: "", state: "", pincode: "" }, password: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -67,37 +89,18 @@ const DonorProfile = () => {
     "address.city": { required: true, minLength: 2 },
     "address.state": { required: true, minLength: 2 },
     "address.pincode": { required: true, pattern: /^[0-9]{6}$/ },
-    password: { minLength: 6 }
+    password: { minLength: 6 },
   };
 
   const validateField = (name, value) => {
-    const rules = validationRules[name];
-    if (!rules) return null;
-
-    if (rules.required && !value) {
-      return "This field is required";
-    }
-
-    if (rules.minLength && value.length < rules.minLength) {
-      return `Minimum ${rules.minLength} characters required`;
-    }
-
-    if (rules.maxLength && value.length > rules.maxLength) {
-      return `Maximum ${rules.maxLength} characters allowed`;
-    }
-
-    if (rules.min && Number(value) < rules.min) {
-      return `Minimum value is ${rules.min}`;
-    }
-
-    if (rules.max && Number(value) > rules.max) {
-      return `Maximum value is ${rules.max}`;
-    }
-
-    if (rules.pattern && !rules.pattern.test(value)) {
-      return "Invalid format";
-    }
-
+    const r = validationRules[name];
+    if (!r) return null;
+    if (r.required && !value) return "This field is required";
+    if (r.minLength && value.length < r.minLength) return `Minimum ${r.minLength} characters required`;
+    if (r.maxLength && value.length > r.maxLength) return `Maximum ${r.maxLength} characters allowed`;
+    if (r.min && Number(value) < r.min) return `Minimum value is ${r.min}`;
+    if (r.max && Number(value) > r.max) return `Maximum value is ${r.max}`;
+    if (r.pattern && !r.pattern.test(value)) return "Invalid format";
     return null;
   };
 
@@ -105,214 +108,113 @@ const DonorProfile = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("No authorization token found.");
-      }
-
+      if (!token) throw new Error("No authorization token found.");
       const { data } = await axios.get(`${API_BASE_URL}/donor/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       const lastDonationDate = data.donor.lastDonationDate || data.donor.lastDonation;
-
       if (data.donor) {
-        setDonor(data.donor);
         setFormData({
-          fullName: data.donor.fullName || "",
-          phone: data.donor.phone || "",
-          age: data.donor.age || "",
-          gender: data.donor.gender || "",
-          weight: data.donor.weight || "",
-          bloodGroup: data.donor.bloodGroup || "",
+          fullName: data.donor.fullName || "", phone: data.donor.phone || "",
+          age: data.donor.age || "", gender: data.donor.gender || "",
+          weight: data.donor.weight || "", bloodGroup: data.donor.bloodGroup || "",
           address: {
-            street: data.donor.address?.street || "",
-            city: data.donor.address?.city || "",
-            state: data.donor.address?.state || "",
-            pincode: data.donor.address?.pincode || "",
-          },
-          password: ""
+            street: data.donor.address?.street || "", city: data.donor.address?.city || "",
+            state: data.donor.address?.state || "", pincode: data.donor.address?.pincode || "",
+          }, password: "",
         });
         setDonor({
-            ...data.donor,
-            lastDonation: lastDonationDate, // Use the correct key for the display logic below
-            status: data.donor.status || "active", // Default to active if status is missing
-            donorId: data.donor._id, // Use _id as donorId if a specific one isn't provided
+          ...data.donor, lastDonation: lastDonationDate,
+          status: data.donor.status || "active", donorId: data.donor._id,
         });
-      } else {
-        throw new Error(data.message);
-      }
+      } else { throw new Error(data.message); }
     } catch (error) {
-      console.error("❌ Fetch Donor Profile Error:", error);
-      let message;
-
-      if (
-        error.message.includes("No authorization token found") ||
-        error.response?.status === 401
-      ) {
-        message = "Session expired or unauthorized. Please log in.";
-        localStorage.removeItem("token");
-        setDonor(null);
-        toast.error(message);
-        return;
+      console.error("Fetch Donor Profile Error:", error);
+      if (error.message.includes("No authorization token found") || error.response?.status === 401) {
+        localStorage.removeItem("token"); setDonor(null);
+        toast.error("Session expired or unauthorized. Please log in."); return;
       }
-
-      message = error.response?.data?.message || "Failed to load profile";
-      toast.error(message);
+      toast.error(error.response?.data?.message || "Failed to load profile");
       setDonor(null);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }, []);
 
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+  useEffect(() => { fetchProfile(); }, [fetchProfile]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     if (name.startsWith("address.")) {
       const key = name.split(".")[1];
-      setFormData((prev) => {
-        const updatedData = {
-          ...prev,
-          address: { ...prev.address, [key]: value },
-        };
-        validateField(name, value);
-        return updatedData;
-      });
-    } else {
-      setFormData((prev) => {
-        const updatedData = { ...prev, [name]: value };
-        validateField(name, value);
-        return updatedData;
-      });
-    }
-
-    // Clear field error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: null }));
-    }
+      setFormData((prev) => ({ ...prev, address: { ...prev.address, [key]: value } }));
+    } else { setFormData((prev) => ({ ...prev, [name]: value })); }
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
   };
 
   const handleSave = async () => {
-    // Validate all fields
     const newErrors = {};
-    Object.keys(validationRules).forEach(key => {
-      if (key === "password" && !formData.password) return; // Skip password if empty
-      
-      let value;
-      if (key.startsWith("address.")) {
-        const addressKey = key.split(".")[1];
-        value = formData.address[addressKey];
-      } else {
-        value = formData[key];
-      }
-      
+    Object.keys(validationRules).forEach((key) => {
+      if (key === "password" && !formData.password) return;
+      let value = key.startsWith("address.") ? formData.address[key.split(".")[1]] : formData[key];
       const error = validateField(key, value);
       if (error) newErrors[key] = error;
     });
-
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      toast.error("Please fix validation errors before saving");
-      return;
+      setErrors(newErrors); toast.error("Please fix validation errors before saving"); return;
     }
-
     try {
       setSaving(true);
       const token = localStorage.getItem("token");
-      if (!token) {
-        toast.error("Authentication required to save changes.");
-        setSaving(false);
-        return;
-      }
-
+      if (!token) { toast.error("Authentication required."); setSaving(false); return; }
       const payload = {
-        fullName: formData.fullName.trim(),
-        phone: formData.phone.trim(),
-        age: Number(formData.age),
-        gender: formData.gender,
-        weight: Number(formData.weight),
+        fullName: formData.fullName.trim(), phone: formData.phone.trim(),
+        age: Number(formData.age), gender: formData.gender, weight: Number(formData.weight),
         bloodGroup: formData.bloodGroup,
         address: {
-          street: formData.address.street.trim(),
-          city: formData.address.city.trim(),
-          state: formData.address.state.trim(),
-          pincode: formData.address.pincode.trim(),
+          street: formData.address.street.trim(), city: formData.address.city.trim(),
+          state: formData.address.state.trim(), pincode: formData.address.pincode.trim(),
         },
       };
-
-      // Only include password if provided
-      if (formData.password && formData.password.length >= 6) {
-        payload.password = formData.password;
-      }
-
-      const { data } = await axios.put(
-        `${API_BASE_URL}/donor/profile`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      if (formData.password && formData.password.length >= 6) payload.password = formData.password;
+      const { data } = await axios.put(`${API_BASE_URL}/donor/profile`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (data.success) {
-        toast.success("Profile updated successfully! 🎉");
-        setDonor(data.donor);
-        setIsEditing(false);
-        setErrors({});
-        // Clear password field
-        setFormData(prev => ({ ...prev, password: "" }));
-      } else {
-        throw new Error(data.message);
-      }
+        toast.success("Profile updated successfully!");
+        setDonor(data.donor); setIsEditing(false); setErrors({});
+        setFormData((prev) => ({ ...prev, password: "" }));
+      } else { throw new Error(data.message); }
     } catch (error) {
-
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-      }
-    } finally {
-      setSaving(false);
-    }
+      if (error.response?.data?.errors) setErrors(error.response.data.errors);
+    } finally { setSaving(false); }
   };
 
   const handleCancel = () => {
-    setIsEditing(false);
-    setErrors({});
+    setIsEditing(false); setErrors({});
     if (donor) {
       setFormData({
-        fullName: donor.fullName || "",
-        phone: donor.phone || "",
-        age: donor.age || "",
-        gender: donor.gender || "",
-        weight: donor.weight || "",
-        bloodGroup: donor.bloodGroup || "",
+        fullName: donor.fullName || "", phone: donor.phone || "",
+        age: donor.age || "", gender: donor.gender || "",
+        weight: donor.weight || "", bloodGroup: donor.bloodGroup || "",
         address: {
-          street: donor.address?.street || "",
-          city: donor.address?.city || "",
-          state: donor.address?.state || "",
-          pincode: donor.address?.pincode || "",
-        },
-        password: ""
+          street: donor.address?.street || "", city: donor.address?.city || "",
+          state: donor.address?.state || "", pincode: donor.address?.pincode || "",
+        }, password: "",
       });
     }
   };
 
   if (loading && !donor) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-pulse mb-4">
-            <Heart className="w-12 h-12 text-red-500 mx-auto" />
+          <div className="relative inline-flex items-center justify-center mb-6">
+            <div className="absolute inset-0 rounded-full bg-red-100 animate-ping opacity-60"/>
+            <div className="relative p-5 bg-gradient-to-br from-red-600 to-red-800 rounded-2xl shadow-xl">
+              <User className="w-10 h-10 text-white"/>
+            </div>
           </div>
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">
-            Loading Donor Profile
-          </h2>
-          <p className="text-gray-500">Preparing your donor information...</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading Your Profile</h2>
+          <p className="text-gray-500 text-sm">Preparing your donor information…</p>
         </div>
       </div>
     );
@@ -320,432 +222,222 @@ const DonorProfile = () => {
 
   if (!donor) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-white flex items-center justify-center">
-        <div className="text-center bg-white rounded-2xl shadow-lg border border-red-100 p-8">
-          <Heart className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">
-            Donor Profile Error
-          </h3>
-          <p className="text-gray-600 mb-4">
-            Could not load profile. Please ensure you are authenticated.
-          </p>
-          <button
-            onClick={fetchProfile}
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors"
-          >
-            Retry Loading
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+        <div className="text-center bg-white rounded-3xl shadow-xl border border-gray-100 p-10 max-w-sm w-full">
+          <div className="inline-flex p-4 bg-red-50 rounded-2xl mb-5">
+            <Heart className="w-12 h-12 text-red-500"/>
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Profile Unavailable</h3>
+          <p className="text-gray-500 text-sm mb-6">Could not load your profile. Please ensure you are logged in.</p>
+          <button onClick={fetchProfile}
+            className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+            <RefreshCw className="w-4 h-4"/>Retry Loading
           </button>
         </div>
       </div>
     );
   }
 
+  const isEligible = donor.eligibleToDonate || false;
   const hasErrors = Object.keys(errors).length > 0;
+  const achLevel = (donor.donationHistory?.length || 0) >= 10 ? "Gold"
+    : (donor.donationHistory?.length || 0) >= 5 ? "Silver" : "Bronze";
+  const achColors = {
+    Gold: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" },
+    Silver: { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-200" },
+    Bronze: { bg: "bg-orange-50", text: "text-orange-700", border: "border-orange-200" },
+  };
+  const aStyle = achColors[achLevel];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-white p-6">
-      <Toaster />
-      <div className="max-w-6xl mx-auto">
-        
+    <div className="min-h-screen bg-[#F8FAFC] pb-16 lg:pb-8">
+      <Toaster/>
+      <div className="max-w-7xl mx-auto px-1 py-6">
+
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg border border-red-100 p-6 mb-6">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-red-100 rounded-xl">
-                <Heart className="w-8 h-8 text-red-600" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-800">
-                  {donor.fullName || "Donor Profile"}
-                </h1>
-                <p className="text-gray-600 mt-1 flex items-center gap-2">
-                  <Droplets size={16} className="text-red-500" />
-                  {donor.bloodGroup || "Blood Donor"} • 
-                  <span className="font-mono text-sm">ID: {donor.donorId}</span>
-                </p>
-              </div>
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
+          <div className="flex items-center gap-4">
+            <div className="p-3.5 bg-gradient-to-br from-red-600 to-red-800 rounded-2xl shadow-lg shadow-red-200">
+              <User className="w-8 h-8 text-white"/>
             </div>
-            
-            <div className="flex gap-3">
-              {isEditing ? (
-                <>
-                  <button
-                    onClick={handleCancel}
-                    className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors border border-gray-300"
-                  >
-                    <X size={18} /> Cancel
-                  </button>
-                  <button
-                    onClick={handleSave}
-                    disabled={saving || hasErrors}
-                    className="flex items-center gap-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white px-4 py-2 rounded-lg transition-colors"
-                  >
-                    {saving ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Save size={18} />
-                    )}
-                    Save Changes
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
-                >
-                  <Edit3 size={18} /> Edit Profile
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-red-500 mb-0.5">
+                VitalBridge · Donor Portal
+              </p>
+              <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 leading-none">My Profile</h1>
+              <p className="text-sm text-gray-500 mt-1">View and manage your personal information.</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            {isEditing ? (
+              <>
+                <button onClick={handleCancel}
+                  className="flex items-center gap-2 px-5 py-2.5 border-2 border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-sm font-semibold">
+                  <X size={16}/>Cancel
                 </button>
-              )}
+                <button onClick={handleSave} disabled={saving || hasErrors}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin"/> : <Save size={16}/>}
+                  Save Changes
+                </button>
+              </>
+            ) : (
+              <button onClick={() => setIsEditing(true)}
+                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-sm font-semibold">
+                <Edit3 size={16}/>Edit Profile
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Donor Identity Card */}
+        <div className="mb-8">
+          <div className="relative bg-white rounded-2xl border border-gray-100 p-6 shadow-sm overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-red-500 to-red-700"/>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center flex-shrink-0 shadow-md shadow-red-200">
+                <span className="text-3xl font-black text-white">
+                  {(donor.fullName || "D").split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-2xl font-extrabold text-gray-900 mb-0.5">{donor.fullName || "Donor"}</h2>
+                <p className="text-sm text-gray-400 mb-3 font-mono">ID: {donor.donorId}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-600 text-white border border-red-700 shadow-sm">
+                    <Droplet size={10}/>{donor.bloodGroup || "Unknown"}
+                  </span>
+                  <StatusBadge status={donor.status}/>
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${isEligible ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}>
+                    {isEligible ? <CheckCircle size={10}/> : <Clock size={10}/>}
+                    {isEligible ? "Eligible to Donate" : "Not Currently Eligible"}
+                  </span>
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${aStyle.bg} ${aStyle.text} ${aStyle.border}`}>
+                    <Award size={10}/>{achLevel} Donor
+                  </span>
+                </div>
+              </div>
+              <div className="flex gap-6 sm:gap-8 flex-shrink-0">
+                <div className="text-center">
+                  <p className="text-2xl font-black text-gray-900">{donor.donationHistory?.length || 0}</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide mt-0.5">Donations</p>
+                </div>
+                {donor.lastDonation && (
+                  <div className="text-center">
+                    <p className="text-sm font-bold text-gray-900">
+                      {new Date(donor.lastDonation).toLocaleDateString([], { month: "short", year: "numeric" })}
+                    </p>
+                    <p className="text-xs text-gray-400 uppercase tracking-wide mt-0.5">Last Donation</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Left Sidebar - Donor Status and Quick Info */}
-          <div className="lg:col-span-1 space-y-6">
-            
-            {/* Donor Status Card */}
-            <div className="bg-white rounded-2xl shadow-lg border border-red-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <Award className="w-5 h-5 text-red-600" />
-                Donor Status
-              </h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Status</span>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    donor.status === "active"
-                      ? "bg-green-100 text-green-700"
-                      : donor.status === "pending"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : "bg-red-100 text-red-700"
-                  }`}>
-                    {donor.status?.charAt(0).toUpperCase() + donor.status?.slice(1)}
-                  </span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Blood Group</span>
-                  <span className="text-sm font-bold text-red-600">{donor.bloodGroup || "N/A"}</span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Donor ID</span>
-                  <span className="text-sm font-mono text-gray-800">{donor.donorId}</span>
-                </div>
-                
-                {donor.lastDonation && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Last Donation</span>
-                    <span className="text-sm text-gray-800">
-                      {new Date(donor.lastDonation).toLocaleDateString()}
-                    </span>
+          {/* Sidebar */}
+          <div className="space-y-6">
+            <div>
+              <SectionHeading eyebrow="Contact" icon={<Mail className="w-4 h-4"/>} title="Contact Info"/>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+                {[
+                  { icon: <Mail className="w-4 h-4"/>, label: "Email", value: donor.email },
+                  donor.phone && { icon: <Phone className="w-4 h-4"/>, label: "Phone", value: donor.phone },
+                  donor.age && { icon: <Calendar className="w-4 h-4"/>, label: "Age", value: `${donor.age} years old` },
+                  donor.address?.city && { icon: <MapPin className="w-4 h-4"/>, label: "Location", value: `${donor.address.city}, ${donor.address.state}` },
+                ].filter(Boolean).map((item, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="p-2 bg-red-50 rounded-xl text-red-600 flex-shrink-0 mt-0.5">{item.icon}</div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-0.5">{item.label}</p>
+                      <p className="text-sm font-semibold text-gray-900 truncate">{item.value}</p>
+                    </div>
                   </div>
-                )}
+                ))}
               </div>
             </div>
 
-            {/* Contact Quick Info */}
-            <div className="bg-white rounded-2xl shadow-lg border border-red-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <User className="w-5 h-5 text-red-600" />
-                Quick Info
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 text-sm">
-                  <Mail className="w-4 h-4 text-red-500" />
-                  <span className="text-gray-600">{donor.email}</span>
-                </div>
-                {donor.phone && (
-                  <div className="flex items-center gap-3 text-sm">
-                    <Phone className="w-4 h-4 text-red-500" />
-                    <span className="text-gray-600">{donor.phone}</span>
+            <div>
+              <SectionHeading eyebrow="Account" icon={<Shield className="w-4 h-4"/>} title="Donor Status"/>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-1">
+                {[
+                  { label: "Account Status", el: <StatusBadge status={donor.status}/> },
+                  { label: "Blood Group", el: <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-600 text-white"><Droplet size={10}/>{donor.bloodGroup || "N/A"}</span> },
+                  { label: "Eligibility", el: <span className={`text-xs font-semibold ${isEligible ? "text-emerald-600" : "text-amber-600"}`}>{isEligible ? "Ready to Donate" : "Not Eligible"}</span> },
+                  donor.lastDonation && { label: "Last Donation", el: <span className="text-sm text-gray-800 font-medium">{new Date(donor.lastDonation).toLocaleDateString()}</span> },
+                  { label: "Member Since", el: <span className="text-sm text-gray-800 font-medium">{donor.createdAt ? new Date(donor.createdAt).getFullYear() : "N/A"}</span> },
+                ].filter(Boolean).map((row, i, arr) => (
+                  <div key={i} className={`flex items-center justify-between py-2.5 ${i < arr.length - 1 ? "border-b border-gray-50" : ""}`}>
+                    <span className="text-sm text-gray-500">{row.label}</span>
+                    {row.el}
                   </div>
-                )}
-                {donor.age && (
-                  <div className="flex items-center gap-3 text-sm">
-                    <Calendar className="w-4 h-4 text-red-500" />
-                    <span className="text-gray-600">{donor.age} years old</span>
-                  </div>
-                )}
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Main Content - Editable Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg border border-red-100 p-6">
-              
-              {/* Personal Details */}
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <User className="w-5 h-5 text-red-600" />
-                  Personal Information
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  
-                  {/* Full Name */}
+          {/* Main form */}
+          <div className="lg:col-span-2 space-y-6">
+            <div>
+              <SectionHeading eyebrow="Personal details" icon={<User className="w-4 h-4"/>} title="Personal Information"/>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div><FieldLabel>Full Name</FieldLabel><FormInput type="text" name="fullName" value={formData.fullName} onChange={handleChange} isEditing={isEditing} error={errors.fullName} placeholder="Enter your full name"/></div>
+                  <div><FieldLabel>Phone Number</FieldLabel><FormInput type="tel" name="phone" value={formData.phone} onChange={handleChange} isEditing={isEditing} error={errors.phone} placeholder="10-digit phone number"/></div>
+                  <div><FieldLabel>Age</FieldLabel><FormInput type="number" name="age" value={formData.age} onChange={handleChange} isEditing={isEditing} error={errors.age} min="18" max="65" placeholder="Age (18–65)"/></div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        isEditing
-                          ? "border-gray-300 bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                          : "bg-gray-50 border-gray-200"
-                      } ${errors.fullName ? "border-red-500" : ""}`}
-                      placeholder="Enter your full name"
-                    />
-                    {errors.fullName && (
-                      <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
-                        <AlertCircle size={12} />
-                        {errors.fullName}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Phone Number */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        isEditing
-                          ? "border-gray-300 bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                          : "bg-gray-50 border-gray-200"
-                      } ${errors.phone ? "border-red-500" : ""}`}
-                      placeholder="10-digit phone number"
-                    />
-                    {errors.phone && (
-                      <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
-                        <AlertCircle size={12} />
-                        {errors.phone}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Age */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Age
-                    </label>
-                    <input
-                      type="number"
-                      name="age"
-                      value={formData.age}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      min="18"
-                      max="65"
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        isEditing
-                          ? "border-gray-300 bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                          : "bg-gray-50 border-gray-200"
-                      } ${errors.age ? "border-red-500" : ""}`}
-                      placeholder="Your age"
-                    />
-                    {errors.age && (
-                      <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
-                        <AlertCircle size={12} />
-                        {errors.age}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Gender */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Gender
-                    </label>
-                    <select
-                      name="gender"
-                      value={formData.gender}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        isEditing
-                          ? "border-gray-300 bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                          : "bg-gray-50 border-gray-200"
-                      } ${errors.gender ? "border-red-500" : ""}`}
-                    >
+                    <FieldLabel>Gender</FieldLabel>
+                    <FormSelect name="gender" value={formData.gender} onChange={handleChange} isEditing={isEditing} error={errors.gender}>
                       <option value="">Select Gender</option>
-                      {GENDER_OPTIONS.map(option => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.gender && (
-                      <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
-                        <AlertCircle size={12} />
-                        {errors.gender}
-                      </p>
-                    )}
+                      {GENDER_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    </FormSelect>
                   </div>
-
-                  {/* Weight */}
+                  <div><FieldLabel>Weight (kg)</FieldLabel><FormInput type="number" name="weight" value={formData.weight} onChange={handleChange} isEditing={isEditing} error={errors.weight} min="45" max="200" step="0.1" placeholder="Weight in kg (min. 45)"/></div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Weight (kg)
-                    </label>
-                    <input
-                      type="number"
-                      name="weight"
-                      value={formData.weight}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      min="45"
-                      max="200"
-                      step="0.1"
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        isEditing
-                          ? "border-gray-300 bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                          : "bg-gray-50 border-gray-200"
-                      } ${errors.weight ? "border-red-500" : ""}`}
-                      placeholder="Weight in kg"
-                    />
-                    {errors.weight && (
-                      <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
-                        <AlertCircle size={12} />
-                        {errors.weight}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Blood Group */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Blood Group
-                    </label>
-                    <select
-                      name="bloodGroup"
-                      value={formData.bloodGroup}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        isEditing
-                          ? "border-gray-300 bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                          : "bg-gray-50 border-gray-200"
-                      } ${errors.bloodGroup ? "border-red-500" : ""}`}
-                    >
+                    <FieldLabel>Blood Group</FieldLabel>
+                    <FormSelect name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} isEditing={isEditing} error={errors.bloodGroup}>
                       <option value="">Select Blood Group</option>
-                      {BLOOD_GROUPS.map(group => (
-                        <option key={group} value={group}>
-                          {group}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.bloodGroup && (
-                      <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
-                        <AlertCircle size={12} />
-                        {errors.bloodGroup}
-                      </p>
-                    )}
+                      {BLOOD_GROUPS.map((g) => <option key={g} value={g}>{g}</option>)}
+                    </FormSelect>
                   </div>
                 </div>
               </div>
-
-              {/* Address Information */}
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-red-600" />
-                  Address Information
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {["street", "city", "state", "pincode"].map((field) => (
-                    <div key={field} className={field === "street" ? "md:col-span-2" : ""}>
-                      <label className="block text-sm font-medium text-gray-700 mb-2 capitalize">
-                        {field === "pincode" ? "PIN Code" : field}
-                      </label>
-                      <input
-                        type={field === "pincode" ? "number" : "text"}
-                        name={`address.${field}`}
-                        value={formData.address?.[field] || ""}
-                        onChange={handleChange}
-                        disabled={!isEditing}
-                        className={`w-full px-4 py-3 rounded-xl border ${
-                          isEditing
-                            ? "border-gray-300 bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                            : "bg-gray-50 border-gray-200"
-                        } ${
-                          errors[`address.${field}`] ? "border-red-500" : ""
-                        }`}
-                        placeholder={`Enter ${field === "pincode" ? "PIN code" : field}`}
-                      />
-                      {errors[`address.${field}`] && (
-                        <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
-                          <AlertCircle size={12} />
-                          {errors[`address.${field}`]}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Email (Read-only) */}
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <Mail className="w-5 h-5 text-red-600" />
-                  Email Address
-                </h3>
-                <input
-                  type="email"
-                  value={donor.email}
-                  disabled
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600"
-                />
-                <p className="text-xs text-gray-500 mt-2">Email cannot be changed</p>
-              </div>
-
-              {/* Password Update */}
-              {isEditing && (
-                <div className="mb-8">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                    Change Password
-                  </h3>
-                  <div className="max-w-md">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      New Password (optional)
-                    </label>
-                    <input
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        isEditing
-                          ? "border-gray-300 bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                          : "bg-gray-50 border-gray-200"
-                      } ${errors.password ? "border-red-500" : ""}`}
-                      placeholder="Enter new password (min. 6 characters)"
-                    />
-                    {errors.password && (
-                      <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
-                        <AlertCircle size={12} />
-                        {errors.password}
-                      </p>
-                    )}
-                    <p className="text-xs text-gray-500 mt-2">
-                      Leave blank to keep current password
-                    </p>
-                  </div>
-                </div>
-              )}
             </div>
+
+            <div>
+              <SectionHeading eyebrow="Location" icon={<MapPin className="w-4 h-4"/>} title="Address Information"/>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="md:col-span-2"><FieldLabel>Street Address</FieldLabel><FormInput type="text" name="address.street" value={formData.address?.street || ""} onChange={handleChange} isEditing={isEditing} error={errors["address.street"]} placeholder="Enter street address"/></div>
+                  <div><FieldLabel>City</FieldLabel><FormInput type="text" name="address.city" value={formData.address?.city || ""} onChange={handleChange} isEditing={isEditing} error={errors["address.city"]} placeholder="Enter city"/></div>
+                  <div><FieldLabel>State</FieldLabel><FormInput type="text" name="address.state" value={formData.address?.state || ""} onChange={handleChange} isEditing={isEditing} error={errors["address.state"]} placeholder="Enter state"/></div>
+                  <div><FieldLabel>PIN Code</FieldLabel><FormInput type="number" name="address.pincode" value={formData.address?.pincode || ""} onChange={handleChange} isEditing={isEditing} error={errors["address.pincode"]} placeholder="6-digit PIN code"/></div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <SectionHeading eyebrow="Account" icon={<Mail className="w-4 h-4"/>} title="Email Address"/>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <FieldLabel>Email (cannot be changed)</FieldLabel>
+                <input type="email" value={donor.email} disabled className={`${iB} ${iD}`}/>
+                <p className="text-xs text-gray-400 mt-2">Contact support to update your email address.</p>
+              </div>
+            </div>
+
+            {isEditing && (
+              <div>
+                <SectionHeading eyebrow="Security" icon={<Shield className="w-4 h-4"/>} title="Change Password"/>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                  <div className="max-w-md">
+                    <FieldLabel>New Password (optional)</FieldLabel>
+                    <FormInput type="password" name="password" value={formData.password} onChange={handleChange} isEditing={isEditing} error={errors.password} placeholder="Min. 6 characters"/>
+                    <p className="text-xs text-gray-400 mt-2">Leave blank to keep your current password.</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
