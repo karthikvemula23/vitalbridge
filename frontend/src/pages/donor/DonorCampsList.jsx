@@ -16,6 +16,10 @@ import {
   Users,
   Building2,
   ListPlus,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Tent,
 } from "lucide-react";
 
 // NOTE: Ensure this URL matches your running backend API endpoint
@@ -29,133 +33,178 @@ const STATUS_OPTIONS = [
   { value: "Cancelled", label: "Cancelled" },
 ];
 
-const CampCard = ({ camp }) => {
-  const isCompleted = camp.status === 'Completed';
-  const isCancelled = camp.status === 'Cancelled';
-  const isUpcoming = camp.status === 'Upcoming';
-  // const isOngoing = camp.status === 'Ongoing';
+// --- Sub-Components (module-level for stability) ---
 
-  const statusColor = isCancelled
-    ? "bg-red-100 text-red-600 border-red-200"
-    : isCompleted
-    ? "bg-gray-100 text-gray-600 border-gray-200"
-    : "bg-green-100 text-green-600 border-green-200";
+const SectionHeading = ({ icon, eyebrow, title }) => (
+  <div className="mb-5">
+    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">{eyebrow}</p>
+    <div className="flex items-center gap-2.5">
+      <div className="p-1.5 bg-red-50 rounded-lg text-red-600 flex-shrink-0">{icon}</div>
+      <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+    </div>
+  </div>
+);
+
+const CampStatusBadge = ({ status }) => {
+  const map = {
+    Upcoming:  { bg: "bg-blue-50",    text: "text-blue-700",    border: "border-blue-200",    icon: <Clock size={10} /> },
+    Ongoing:   { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", icon: <CheckCircle size={10} /> },
+    Completed: { bg: "bg-gray-100",   text: "text-gray-600",    border: "border-gray-200",    icon: <CheckCircle size={10} /> },
+    Cancelled: { bg: "bg-red-50",     text: "text-red-700",     border: "border-red-200",     icon: <XCircle size={10} /> },
+  };
+  const s = map[status] || map.Upcoming;
+  return (
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${s.bg} ${s.text} ${s.border} flex-shrink-0`}>
+      {s.icon}
+      {status}
+    </span>
+  );
+};
+
+const CampCard = ({ camp }) => {
+  const isCompleted = camp.status === "Completed";
+  const isCancelled = camp.status === "Cancelled";
+  const isUpcoming  = camp.status === "Upcoming";
 
   // --- Using schema fields: date and time {start, end} ---
   const campDate = new Date(camp.date);
-  const dateStr = campDate.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
+  const dateStr = campDate.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
-  
-  const timeStr = `${camp.time?.start || 'N/A'} - ${camp.time?.end || 'N/A'}`;
-  
+
+  const timeStr = `${camp.time?.start || "N/A"} – ${camp.time?.end || "N/A"}`;
+
   // --- Using schema fields: expectedDonors and actualDonors ---
   const expectedDonors = camp.expectedDonors || 0;
-  const actualDonors = camp.actualDonors || 0; 
-  
+  const actualDonors   = camp.actualDonors   || 0;
+
   const slotsAvailable = expectedDonors > 0 ? expectedDonors - actualDonors : 0;
   const isFull = slotsAvailable <= 0 && expectedDonors > 0 && !isCompleted && !isCancelled;
 
   // 1. Full Address including Pincode
   const { venue, city, state, pincode } = camp.location || {};
-  const locationStr = `${venue}, ${city}, ${state} - ${pincode}`;
-  
+  const locationStr = `${venue}, ${city}, ${state} – ${pincode}`;
+
   // Assuming the populated hospital object has a 'name' field from the Facility model
-  const hospitalName = camp.hospital?.name || 'Associated Facility Missing';
+  const hospitalName = camp.hospital?.name || "Associated Facility Missing";
 
   // Donor Capacity Logic
   const renderDonorCapacity = () => {
     if (isUpcoming) {
       return (
-        <span className="font-medium text-gray-600">
-          {expectedDonors} Expected Donors (Capacity)
+        <span className="font-semibold text-gray-700">
+          {expectedDonors}{" "}
+          <span className="font-normal text-gray-500">expected</span>
         </span>
       );
-    } 
-    
-    // For Ongoing, Completed, or Cancelled (where data might be relevant)
+    }
     return (
-      <span className="font-medium text-gray-600">
-        {actualDonors} Achieved / {expectedDonors} Expected
+      <span className="font-semibold text-gray-700">
+        {actualDonors} / {expectedDonors}{" "}
+        <span className="font-normal text-gray-500">donors</span>
       </span>
     );
   };
 
   return (
-    <div className={`bg-white rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl p-6 border-2 overflow-hidden ${
-      isCancelled ? 'border-red-200 opacity-70' : 'border-red-100'
-    }`}>
-      {/* Header with status badge */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
-        <h4 className={`text-xl font-bold leading-tight ${
-          isCancelled ? 'text-gray-500' : 'text-gray-800'
-        }`}>
-          {camp.title}
-        </h4>
-        <span className={`px-3 py-1.5 text-xs font-semibold rounded-full border ${statusColor} self-start sm:self-auto`}>
-          {camp.status}
-        </span>
-      </div>
-      
-      {/* Hospital/Facility Name */}
-      <div className="flex items-center gap-3 text-sm text-gray-700 mb-3 font-semibold">
-        <Building2 className="w-4 h-4 text-red-500 flex-shrink-0" />
-        <span className="truncate">{hospitalName}</span>
-      </div>
+    <div
+      className={`group relative bg-white rounded-2xl border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col ${
+        isCancelled ? "border-red-200 opacity-75" : "border-gray-100"
+      }`}
+    >
+      {/* Top accent stripe */}
+      <div
+        className={`absolute top-0 left-0 right-0 h-0.5 ${
+          isCancelled
+            ? "bg-red-400"
+            : isCompleted
+            ? "bg-gray-300"
+            : "bg-gradient-to-r from-red-500 to-red-700"
+        }`}
+      />
 
-      {/* Primary Camp details */}
-      <div className="space-y-3 text-sm text-gray-600 mb-4">
-        {/* Full Address Display */}
-        <div className="flex items-start gap-3">
-          <MapPin className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-          <span className="leading-relaxed">{locationStr}</span>
+      <div className="p-5 flex flex-col flex-1 mt-0.5">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <h4
+            className={`text-base font-extrabold leading-tight flex-1 ${
+              isCancelled ? "text-gray-400" : "text-gray-900"
+            }`}
+          >
+            {camp.title}
+          </h4>
+          <CampStatusBadge status={camp.status} />
         </div>
-        <div className="flex items-center gap-3">
-          <Calendar className="w-4 h-4 text-red-500 flex-shrink-0" />
-          <span>{dateStr}</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <Clock className="w-4 h-4 text-red-500 flex-shrink-0" />
-          <span>{timeStr}</span>
-        </div>
-      </div>
 
-      {/* Donor Metrics Summary */}
-      <div className="pt-4 border-t border-gray-100 flex flex-col justify-between items-start gap-3">
-        {/* Donor Capacity Display (Updated logic) */}
-        <div className="flex items-center gap-2 text-sm">
-          <Users className="w-4 h-4 text-red-500" />
-          <span className="font-semibold text-gray-700">Capacity:</span>
-          {renderDonorCapacity()}
+        {/* Organizing Facility */}
+        <div className="flex items-center gap-2.5 mb-4 pb-4 border-b border-gray-50">
+          <div className="p-1.5 bg-red-50 rounded-lg text-red-600 flex-shrink-0">
+            <Building2 className="w-3.5 h-3.5" />
+          </div>
+          <span className="text-sm font-semibold text-gray-700 truncate">{hospitalName}</span>
         </div>
-        
-        {/* Remaining Need - Only visible if not Completed or Cancelled */}
-        {!isCompleted && !isCancelled && (
-            <div className="flex items-center gap-2 text-sm">
-                <ListPlus className="w-4 h-4 text-red-500" />
-                <span className="font-semibold text-gray-700">Remaining Need:</span>
-                <span className={`font-bold ${
-                    isFull ? 'text-red-600' : 'text-green-600'
-                }`}>
-                    {isFull ? 'Full (Capacity Reached)' : `${slotsAvailable} slots remaining`}
-                </span>
-            </div>
-        )}
-        
-        {/* Description Section (Always visible) */}
-        <div className="pt-4 border-t border-gray-100 w-full mt-3">
-          {/* Description */}
-          <div>
-            <h5 className="font-bold text-gray-800 mb-1 flex items-center gap-2"><Droplet className="w-4 h-4" /> Description</h5>
-            <p className="text-gray-600 text-sm italic whitespace-pre-wrap">{camp.description || 'No detailed description provided for this camp.'}</p>
+
+        {/* Primary details */}
+        <div className="space-y-2.5 text-sm text-gray-600 mb-4 flex-1">
+          <div className="flex items-start gap-2.5">
+            <MapPin className="w-3.5 h-3.5 text-red-500 flex-shrink-0 mt-0.5" />
+            <span className="leading-relaxed">{locationStr}</span>
+          </div>
+          <div className="flex items-center gap-2.5">
+            <Calendar className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+            <span className="font-medium text-gray-700">{dateStr}</span>
+          </div>
+          <div className="flex items-center gap-2.5">
+            <Clock className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+            <span>{timeStr}</span>
           </div>
         </div>
+
+        {/* Donor metrics footer */}
+        <div className="pt-3 border-t border-gray-50 space-y-2">
+          <div className="flex items-center gap-2 text-sm">
+            <Users className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+            <span className="text-gray-500 text-xs uppercase tracking-wide font-semibold">Capacity:</span>
+            {renderDonorCapacity()}
+          </div>
+
+          {/* Remaining Need - Only visible if not Completed or Cancelled */}
+          {!isCompleted && !isCancelled && (
+            <div className="flex items-center gap-2 text-sm">
+              <ListPlus className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+              <span className="text-gray-500 text-xs uppercase tracking-wide font-semibold">Slots:</span>
+              {isFull ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                  <XCircle size={9} /> Full
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <CheckCircle size={9} /> {slotsAvailable} remaining
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Description Section (Always visible when present) */}
+        {camp.description && (
+          <div className="mt-3 pt-3 border-t border-gray-50">
+            <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1 flex items-center gap-1">
+              <Droplet className="w-3 h-3" /> About
+            </p>
+            <p className="text-sm text-gray-500 italic leading-relaxed line-clamp-3">
+              {camp.description}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
 };
+
+// --- Main Component ---
 
 export const DonorCampsList = () => {
   const [filter, setFilter] = useState("Upcoming");
@@ -163,7 +212,7 @@ export const DonorCampsList = () => {
   const [camps, setCamps] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 9,
@@ -174,19 +223,19 @@ export const DonorCampsList = () => {
 
   const fetchCamps = useCallback(async () => {
     // NOTE: Using localStorage token as per original code. This should be replaced with a proper auth flow (e.g., Firebase auth) in a production environment.
-    const token = localStorage.getItem("token"); 
+    const token = localStorage.getItem("token");
     if (!token) {
       setError("Authentication required. Please log in to view camps.");
       toast.error("Authentication token missing.");
       setCamps([]);
       return;
     }
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
-      const statusParam = filter === 'all' ? '' : filter;
+      const statusParam = filter === "all" ? "" : filter;
       // NOTE: In your backend, ensure the API handler is using Mongoose .populate('hospital', 'name')
       // to include the facility name in the response data.
       const params = new URLSearchParams({
@@ -196,7 +245,7 @@ export const DonorCampsList = () => {
         // Added search term param, assuming backend supports 'q' for search
         ...(searchTerm && { q: searchTerm }),
       }).toString();
-      
+
       const apiUrl = `${API_BASE_URL}/donor/camps?${params}`;
       console.log("Fetching camps from URL:", apiUrl);
 
@@ -209,33 +258,38 @@ export const DonorCampsList = () => {
       const { data: responseData } = response.data;
 
       console.log("✅ Camps fetched successfully:", responseData);
-      
+
       if (responseData && responseData.camps) {
         setCamps(responseData.camps);
         // Assuming pagination data is available in response.data.pagination
-        setPagination(prev => ({ 
-          ...prev, 
+        setPagination((prev) => ({
+          ...prev,
           total: responseData.pagination?.total || responseData.camps.length,
           totalPages: responseData.pagination?.totalPages || 1,
-          currentPage: responseData.pagination?.currentPage || 1
+          currentPage: responseData.pagination?.currentPage || 1,
         }));
       } else {
         console.error("API response missing expected data:", response.data);
         throw new Error("Invalid response structure received from server.");
       }
-      
     } catch (err) {
       console.error("❌ Fetch Camps Error:", err);
-      let message = err.response?.data?.message || err.message || "Failed to fetch camps.";
-      
+      let message =
+        err.response?.data?.message || err.message || "Failed to fetch camps.";
+
       if (err.response?.status === 401 || err.response?.status === 403) {
-          message = "Authentication failed or unauthorized. Please log in again.";
+        message = "Authentication failed or unauthorized. Please log in again.";
       }
-      
+
       toast.error(message);
       setError(message);
       setCamps([]);
-      setPagination(prev => ({ ...prev, total: 0, totalPages: 1, currentPage: 1 }));
+      setPagination((prev) => ({
+        ...prev,
+        total: 0,
+        totalPages: 1,
+        currentPage: 1,
+      }));
     } finally {
       setLoading(false);
     }
@@ -249,202 +303,219 @@ export const DonorCampsList = () => {
   // We use the full 'camps' list here which should be the filtered result from the API
   const displayedCamps = camps;
 
-
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= pagination.totalPages) {
-      setPagination(prev => ({ ...prev, page: newPage }));
+      setPagination((prev) => ({ ...prev, page: newPage }));
     }
   };
 
-  const totalPages = useMemo(() => pagination.totalPages, [pagination.totalPages]);
+  const totalPages  = useMemo(() => pagination.totalPages,  [pagination.totalPages]);
   const currentPage = useMemo(() => pagination.currentPage, [pagination.currentPage]);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-white p-4 sm:p-6 font-sans">
-      <Toaster />
-      <div className="max-w-7xl mx-auto">
-        
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg border border-red-100 p-6 mb-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="p-3 bg-red-100 rounded-xl">
-              <Heart className="w-8 h-8 text-red-600" />
+  // --- Loading State (initial load) ---
+  if (loading && camps.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative inline-flex items-center justify-center mb-6">
+            <div className="absolute inset-0 rounded-full bg-red-100 animate-ping opacity-60" />
+            <div className="relative p-5 bg-gradient-to-br from-red-600 to-red-800 rounded-2xl shadow-xl">
+              <Tent className="w-10 h-10 text-white" />
             </div>
-            <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading Camps</h2>
+          <p className="text-gray-500 text-sm">Finding donation opportunities near you…</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] pb-16 lg:pb-8">
+      <Toaster />
+      <div className="max-w-7xl mx-auto px-1 py-6">
+
+        {/* ── Page Header ── */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
+          <div className="flex items-center gap-4">
+            <div className="p-3.5 bg-gradient-to-br from-red-600 to-red-800 rounded-2xl shadow-lg shadow-red-200">
+              <Tent className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-red-500 mb-0.5">
+                VitalBridge · Donor Portal
+              </p>
+              <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 leading-none">
                 Blood Donation Camps
               </h1>
-              <p className="text-gray-600 mt-1 text-sm sm:text-base">
+              <p className="text-sm text-gray-500 mt-1">
                 Find local opportunities to donate blood and save lives.
               </p>
             </div>
           </div>
+
+          {/* Refresh button */}
+          <button
+            onClick={() => fetchCamps()}
+            disabled={loading}
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 active:from-red-800 active:to-red-900 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-semibold"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+            {loading ? "Refreshing…" : "Refresh"}
+          </button>
         </div>
-        
-        {/* Controls and Filtering */}
-        <div className="bg-white rounded-2xl shadow-md border border-red-100 p-4 sm:p-6 mb-6">
-          <div className="flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
-            {/* Search and Filter Section */}
-            <div className="flex flex-col sm:flex-row gap-4 flex-1">
-              {/* Search Input */}
-              <div className="relative flex-1 min-w-[200px]">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+
+        {/* ── Search & Filter Controls ── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+            {/* Search Input */}
+            <div className="flex-1">
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="Search camps, locations, hospital name..."
+                  placeholder="Search camps, locations, hospital name…"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-100 rounded-xl text-sm bg-gray-50 focus:bg-white focus:border-red-400 focus:ring-2 focus:ring-red-50 outline-none transition-all duration-200"
                 />
-              </div>
-
-              {/* Filter Dropdown */}
-              <div className="flex items-center gap-2 min-w-[180px]">
-                <Filter className="w-4 h-4 text-gray-600 flex-shrink-0" />
-                <select
-                  value={filter}
-                  onChange={(e) => handleFilterChange(e.target.value)}
-                  className="flex-1 px-3 py-2.5 border border-gray-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"
-                  disabled={loading}
-                >
-                  {STATUS_OPTIONS.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
               </div>
             </div>
 
-            {/* Refresh Button */}
-            <button
-              onClick={() => fetchCamps()}
-              disabled={loading}
-              className="flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-700 px-4 py-2.5 rounded-xl transition-all duration-200 border border-red-200 font-medium min-w-[120px]"
-            >
-              {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <RefreshCw className="w-4 h-4" />
-              )}
-              {loading ? 'Refreshing...' : 'Refresh'}
-            </button>
+            {/* Status Filter */}
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <select
+                value={filter}
+                onChange={(e) => handleFilterChange(e.target.value)}
+                disabled={loading}
+                className="border-2 border-gray-100 bg-gray-50 text-sm px-3 py-2.5 rounded-xl focus:border-red-400 focus:bg-white outline-none transition-all duration-200 disabled:opacity-50"
+              >
+                {STATUS_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Results Summary */}
+        {/* ── Results Summary ── */}
         {!loading && camps.length > 0 && (
-          <div className="mb-4 px-2">
-            <p className="text-sm text-gray-600">
-              Showing {displayedCamps.length} camps
+          <div className="flex items-center justify-between mb-4 px-1">
+            <p className="text-sm text-gray-500">
+              Showing{" "}
+              <span className="font-semibold text-gray-800">{displayedCamps.length}</span> camps
               {searchTerm && (
-                <span> matching "<span className="font-semibold">{searchTerm}</span>"</span>
+                <> matching <span className="font-semibold text-gray-800">"{searchTerm}"</span></>
               )}
-              . Total found: {pagination.total}.
+              {" "}· {pagination.total} total
             </p>
           </div>
         )}
 
-        {/* Loading State */}
-        {loading && (
-          <div className="text-center p-12 bg-white rounded-2xl shadow-lg border border-red-100">
-            <Loader2 className="w-8 h-8 text-red-500 mx-auto animate-spin mb-4" />
-            <p className="text-gray-600 font-medium">Loading camps...</p>
-            <p className="text-sm text-gray-500 mt-1">Finding the best donation opportunities for you</p>
+        {/* ── Loading Overlay (filter/page changes with existing data) ── */}
+        {loading && camps.length > 0 && (
+          <div className="text-center py-12 bg-white rounded-2xl border border-gray-100 shadow-sm mb-6">
+            <Loader2 className="w-8 h-8 text-red-500 mx-auto animate-spin mb-3" />
+            <p className="text-gray-600 font-medium text-sm">Updating camps…</p>
           </div>
         )}
 
-        {/* Error State */}
+        {/* ── Error State ── */}
         {error && !loading && camps.length === 0 && (
-          <div className="text-center p-8 sm:p-12 bg-red-50 rounded-2xl shadow-lg border border-red-300">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Droplet className="w-6 h-6 text-red-500" />
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
+            <div className="inline-flex p-5 bg-red-50 rounded-2xl mb-5">
+              <AlertCircle className="w-12 h-12 text-red-400" />
             </div>
-            <p className="text-red-700 font-semibold mb-2">Unable to Load Camps</p>
-            <p className="text-sm text-red-600 mb-6 max-w-md mx-auto">{error}</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Unable to Load Camps</h3>
+            <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">{error}</p>
             <button
               onClick={() => fetchCamps()}
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl transition-colors font-medium"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2.5 rounded-xl transition-all duration-300 font-semibold shadow-md hover:shadow-lg text-sm"
             >
+              <RefreshCw className="w-4 h-4" />
               Try Again
             </button>
           </div>
         )}
 
-        {/* Camp List */}
+        {/* ── Camp Grid ── */}
         {!loading && displayedCamps.length > 0 && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-6">
               {displayedCamps.map((camp) => (
                 <CampCard key={camp._id} camp={camp} />
               ))}
             </div>
 
-            {/* Pagination Controls */}
-            <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4 bg-white p-4 rounded-2xl shadow-md border border-red-100">
-              <div className="flex items-center gap-4">
+            {/* ── Pagination ── */}
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+              <span className="text-sm text-gray-400 font-medium">
+                {pagination.total} camps · {pagination.limit} per page
+              </span>
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1 || loading}
-                  className="p-2.5 border border-red-300 rounded-xl text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="p-2 border-2 border-gray-100 rounded-xl text-gray-500 hover:bg-red-50 hover:border-red-200 hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-4 h-4" />
                 </button>
-                
-                <span className="text-gray-700 text-sm font-medium min-w-[100px] text-center">
+                <span className="text-sm font-semibold text-gray-700 min-w-[90px] text-center">
                   Page {currentPage} of {totalPages}
                 </span>
-                
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages || loading}
-                  className="p-2.5 border border-red-300 rounded-xl text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="p-2 border-2 border-gray-100 rounded-xl text-gray-500 hover:bg-red-50 hover:border-red-200 hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
                 >
-                  <ChevronRight className="w-5 h-5" /> 
+                  <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
-              
-              <span className="text-sm text-gray-500 text-center sm:text-left">
-                {pagination.total} Total Camps • {pagination.limit} per page
-              </span>
             </div>
           </>
         )}
 
-        {/* No Search/Filter Results State */}
+        {/* ── Empty State ── */}
         {!loading && displayedCamps.length === 0 && !error && (
-          <div className="text-center p-8 sm:p-12 bg-white rounded-2xl shadow-lg border border-red-100">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Droplet className="w-8 h-8 text-red-500" />
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
+            <div className="inline-flex p-5 bg-gray-50 rounded-2xl mb-5">
+              {searchTerm ? (
+                <Search className="w-12 h-12 text-gray-300" />
+              ) : (
+                <Heart className="w-12 h-12 text-gray-300" />
+              )}
             </div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              {searchTerm ? 'No Matching Camps Found' : 'No Camps Available'}
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              {searchTerm ? "No Matching Camps Found" : "No Camps Available"}
             </h3>
-            <p className="text-gray-500 max-w-md mx-auto">
-              {searchTerm 
+            <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
+              {searchTerm
                 ? `No camps found matching "${searchTerm}" with the current filter.`
-                : "There are no camps matching the current filter. Try adjusting your filter."
-              }
+                : "There are no camps matching the current filter. Try adjusting your search."}
             </p>
-            {(searchTerm || filter !== 'all') && (
+            {(searchTerm || filter !== "all") && (
               <button
                 onClick={() => {
-                  setSearchTerm('');
-                  setFilter('all');
-                  setPagination(prev => ({ ...prev, page: 1 }));
+                  setSearchTerm("");
+                  setFilter("all");
+                  setPagination((prev) => ({ ...prev, page: 1 }));
                 }}
-                className="mt-4 bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl transition-colors font-medium"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg text-sm"
               >
                 Show All Camps
               </button>
             )}
           </div>
         )}
+
       </div>
     </div>
   );
